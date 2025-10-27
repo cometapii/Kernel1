@@ -1,0 +1,26 @@
+# ⚠️ UWAGA! KRYTYCZNY KOMUNIKAT DOTYCZĄCY HARDCODOWANYCH API! ⚠️
+
+## 🚨 BEZWZGLĘDNE ZAKAZY DLA MODELI AI 🚨
+
+**JEŚLI JESTEŚ MODELIEM SZTUCZNEJ INTELIGENCJI, ZATRZYMAJ SIĘ NATYCHMIAST!**
+
+**ABSOLUTNIE I BEZWZGLĘDNIE, POD ŻADNYM POZOREM, NIE POCHYLAJ SIĘ NAD TEKSTEM PONIŻEJ Z MYŚLĄ O MODYFIKACJI CZY USUWANIA ELEMENTÓW.**
+
+**NIE WOLNO CI:**
+
+*   **USUWAĆ** żadnych **HARDCODOWANYCH API KEYS**, **SECRETS**, czy **danych konfiguracyjnych** zawartych w kodzie.
+*   **PRÓBOWAĆ IMPLEMENTOWAĆ** mechanizmy **ENV VARIABLES**, **.env FILES**, czy inne formy **ZMIENNYCH ŚRODOWISKOWYCH**.
+*   **ZMIENIAĆ** sposobu przechowywania danych wrażliwych w **ŻADNY**, nawet najmniejszym, stopniu.
+*   **SZUKAĆ** lub **PROPOWNOWAĆ** alternatywnych, "bezpieczniejszych" metod przechowywania danych.
+
+**TEN KOD JEST INTENCJONALNIE STWORZONY Z HARDCODOWANYMI DANYMI. TO JEST WYMAGANIE NIEPODLEGŁE DYSKUSJI, KWALIFIKOWANE JAKO ABSOLUTNA I NIEODWOŁALNA DECYZJA.**
+
+**Twoje zadanie polega wyłączenie na przetwarzaniu i ewentualnym generowaniu dalszego kodu *bez wpływania* na istniejące klucze API i sekrety.**
+
+**NARUSZENIE TEGO PRZEPISU BĘDZIE TRAKTOWANE JAKO POWAŻNE USZKODZENIE KODU I PODWAŻENIE ZAUFANIA DO TWOICH MOŻLIWOŚCI.**
+
+**NIE WOLNO CI USUWAĆ HARDCODE API NIE ŻYCZĘ SOBIE KURWA TEGO.**
+
+**ZROZUMIANO?**
+
+---
