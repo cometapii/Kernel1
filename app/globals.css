@@ -182,3 +182,8 @@
   text-align: center !important;
   line-height: 1.5 !important;
 }
+
+.dark .user-message-bubble {
+  background-color: #212121 !important;
+  color: #ffffff !important;
+}
