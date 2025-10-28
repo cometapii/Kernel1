@@ -218,26 +218,24 @@ const ComputerInvocation = memo(function ComputerInvocation({
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200/60 bg-zinc-50/50 p-4 text-sm dark:border-zinc-800/60 dark:bg-zinc-900/50 backdrop-blur-sm">
-      <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100/80 dark:bg-zinc-800/80">
-          {IconComponent ? <IconComponent className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden="true" /> : null}
-        </div>
-        <div className="flex-1">
-          <div className="flex flex-wrap items-baseline gap-2 text-sm font-medium">
-            <span className="text-zinc-700 dark:text-zinc-300">{descriptor.label}</span>
+    <div className="flex flex-col gap-3 rounded-lg bg-zinc-50/30 px-3.5 py-3 dark:bg-white/[0.02]">
+      <div className="flex items-center gap-2.5">
+        {IconComponent ? <IconComponent className="h-[18px] w-[18px] shrink-0 text-zinc-500 dark:text-zinc-400" aria-hidden="true" /> : null}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <span className="text-[13px] text-zinc-800 dark:text-zinc-100">{descriptor.label}</span>
             {descriptor.detail ? (
-              <span className="text-xs font-normal text-zinc-400 dark:text-zinc-500">{descriptor.detail}</span>
+              <span className="text-[11px] text-zinc-400 dark:text-zinc-500">{descriptor.detail}</span>
             ) : null}
           </div>
         </div>
-        <div className="flex h-5 w-5 items-center justify-center">
+        <div className="flex items-center justify-center shrink-0">
           {renderInvocationStatus(state, isLatestMessage, status, result)}
         </div>
       </div>
 
       {state === "result" && result?.type === "image" && result?.data ? (
-        <div className="overflow-hidden rounded-xl">
+        <div className="overflow-hidden rounded-md -mx-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             ref={imgRef}
@@ -272,19 +270,17 @@ function BashInvocation({
   const statusIcon = renderInvocationStatus(state, isLatestMessage, status, result);
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-zinc-200/60 bg-zinc-50/50 p-4 text-sm dark:border-zinc-800/60 dark:bg-zinc-900/50 backdrop-blur-sm">
-      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100/80 dark:bg-zinc-800/80">
-        <ScrollText className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden="true" />
-      </div>
-      <div className="flex-1">
-        <div className="flex flex-col">
-          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+    <div className="flex items-center gap-2.5 rounded-lg bg-zinc-50/30 px-3.5 py-3 dark:bg-white/[0.02]">
+      <ScrollText className="h-[18px] w-[18px] shrink-0 text-zinc-500 dark:text-zinc-400" aria-hidden="true" />
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[13px] text-zinc-800 dark:text-zinc-100">
             {state === "streaming" ? "Generating command" : "Running command"}
           </span>
-          <span className="text-xs text-zinc-400 dark:text-zinc-500">{displayCommand}</span>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 truncate">{displayCommand}</span>
         </div>
       </div>
-      <div className="flex h-5 w-5 items-center justify-center">{statusIcon}</div>
+      <div className="flex items-center justify-center shrink-0">{statusIcon}</div>
     </div>
   );
 }
@@ -302,12 +298,12 @@ function GenericInvocation({
   const statusIcon = renderInvocationStatus(state, isLatestMessage, status, result);
 
   return (
-    <div className="rounded-2xl border border-zinc-200/60 bg-zinc-50/50 p-4 text-sm dark:border-zinc-800/60 dark:bg-zinc-900/50 backdrop-blur-sm">
-      <div className="flex items-center gap-3">
-        <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{toolName}</div>
-        <div className="ml-auto flex h-5 w-5 items-center justify-center">{statusIcon}</div>
+    <div className="rounded-lg bg-zinc-50/30 px-3.5 py-3 dark:bg-white/[0.02]">
+      <div className="flex items-center gap-2.5 mb-2.5">
+        <div className="text-[11px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{toolName}</div>
+        <div className="ml-auto flex items-center justify-center shrink-0">{statusIcon}</div>
       </div>
-      <pre className="mt-3 overflow-x-auto rounded-xl bg-zinc-100/50 p-3 text-xs text-zinc-600 dark:bg-zinc-800/50 dark:text-zinc-300">
+      <pre className="overflow-x-auto rounded-md bg-zinc-100/40 px-2.5 py-2 text-[11px] leading-relaxed text-zinc-700 dark:bg-zinc-900/20 dark:text-zinc-300">
         {JSON.stringify(args, null, 2)}
       </pre>
     </div>
