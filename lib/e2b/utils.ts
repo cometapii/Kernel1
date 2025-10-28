@@ -1,7 +1,7 @@
 "use server";
 
 import Kernel from '@onkernel/sdk';
-import puppeteer from 'puppeteer-core';
+import { Stagehand } from "@browserbasehq/stagehand";
 import { resolution } from "./tool";
 
 const KERNEL_API_KEY = "sk_bb9ec7e8-9e45-42a5-9d68-72736f11ef05.ffpPsG9fh2Gh+g1uWxA1U8+d7PW29Kpjiqm1+/XlBWk";
@@ -11,8 +11,8 @@ const browserSessions = new Map<string, {
   sessionId: string;
   cdpUrl: string;
   liveViewUrl: string;
+  stagehand: any;
   page: any;
-  browser: any;
 }>();
 
 export const getDesktop = async (id?: string) => {
@@ -32,26 +32,30 @@ export const getDesktop = async (id?: string) => {
     
     const kernelBrowser = await kernel.browsers.create({ 
       stealth: true,
-      // Additional config if needed
     });
 
     console.log("Kernel browser created. Session ID:", kernelBrowser.session_id);
     console.log("Live view URL:", kernelBrowser.browser_live_view_url);
 
-    // Connect Puppeteer to the Kernel browser via CDP
-    const browser = await puppeteer.connect({
-      browserWSEndpoint: kernelBrowser.cdp_ws_url,
-      defaultViewport: {
-        width: resolution.x,
-        height: resolution.y,
+    // Initialize Stagehand with Kernel browser
+    const stagehand = new Stagehand({
+      env: 'LOCAL',
+      verbose: 1,
+      domSettleTimeoutMs: 30_000,
+      modelName: 'openai/gpt-4.1',
+      modelClientOptions: {
+        apiKey: process.env.OPENAI_API_KEY
+      },
+      localBrowserLaunchOptions: {
+        cdpUrl: kernelBrowser.cdp_ws_url
       }
     });
 
-    const pages = await browser.pages();
-    const page = pages.length > 0 ? pages[0] : await browser.newPage();
+    await stagehand.init();
+    const page = stagehand.page;
 
     // Set viewport to match resolution
-    await page.setViewport({
+    await (page as any).setViewport({
       width: resolution.x,
       height: resolution.y,
     });
@@ -60,8 +64,8 @@ export const getDesktop = async (id?: string) => {
       sessionId: kernelBrowser.session_id,
       cdpUrl: kernelBrowser.cdp_ws_url,
       liveViewUrl: kernelBrowser.browser_live_view_url || '',
+      stagehand,
       page,
-      browser,
     };
 
     browserSessions.set(kernelBrowser.session_id, session);
@@ -78,8 +82,8 @@ function createDesktopAPI(session: {
   sessionId: string;
   cdpUrl: string;
   liveViewUrl: string;
+  stagehand: any;
   page: any;
-  browser: any;
 }) {
   const { page, sessionId } = session;
 
@@ -172,7 +176,13 @@ function createDesktopAPI(session: {
       }
     },
     isRunning: async () => {
-      return session.browser.isConnected();
+      // Check if Stagehand page is still active
+      try {
+        await page.evaluate(() => true);
+        return true;
+      } catch {
+        return false;
+      }
     },
     kill: async () => {
       await killDesktop(sessionId);
@@ -196,14 +206,14 @@ export const killDesktop = async (id: string) => {
   try {
     const kernel = new Kernel({ apiKey: KERNEL_API_KEY });
     
-    // Close Puppeteer connection if exists
+    // Close Stagehand connection if exists
     if (browserSessions.has(id)) {
       const session = browserSessions.get(id);
       if (session) {
         try {
-          await session.browser.close();
+          await session.stagehand.close();
         } catch (e) {
-          console.log("Browser already closed or disconnected");
+          console.log("Stagehand already closed or disconnected");
         }
         browserSessions.delete(id);
       }
