@@ -4,7 +4,7 @@ import { resolution } from "@/lib/e2b/tool";
 
 // Google Generative Language API Configuration - HARDCODED
 const GOOGLE_API_KEY = "AIzaSyBBIoNEFvRLhApDBBaDSEZeenDEVg4ar6U";
-const GOOGLE_MODEL = "gemini-2.0-flash";
+const GOOGLE_MODEL = "gemini-2.5-flash";
 
 // KLUCZOWE: Używamy Node.js runtime zamiast Edge dla prawdziwego streamingu
 export const runtime = 'nodejs';
@@ -421,7 +421,8 @@ export async function POST(req: Request) {
   
   const stream = new ReadableStream({
     async start(controller) {
-      const sendEvent = (data: any) => {
+      // PRAWDZIWY STREAMING - ASYNC sendEvent z natychmiastowym flush
+      const sendEvent = async (data: any) => {
         if (isStreamClosed) {
           return;
         }
@@ -437,6 +438,10 @@ export async function POST(req: Request) {
           controller.enqueue(encoder.encode(line));
           
           console.log(`[STREAM] Sent: ${data.type} at ${new Date().toISOString()}`);
+          
+          // KLUCZOWE: Natychmiastowy flush - wymuszenie wysłania do klienta
+          // setImmediate przekazuje kontrolę do event loop, pozwalając przeglądarce odebrać event
+          await new Promise(resolve => setImmediate(resolve));
         } catch (error) {
           console.error('[STREAM] Error:', error);
         }
@@ -490,7 +495,7 @@ export async function POST(req: Request) {
 
           if (delta.content) {
             fullText += delta.content;
-            sendEvent({
+            await sendEvent({
               type: "text-delta",
               delta: delta.content,
               id: "default",
@@ -515,14 +520,14 @@ export async function POST(req: Request) {
                     arguments: "",
                   });
 
-                  sendEvent({
+                  await sendEvent({
                     type: "tool-call-start",
                     toolCallId: toolCallId,
                     index: index,
                   });
 
                   if (toolCallDelta.function?.name) {
-                    sendEvent({
+                    await sendEvent({
                       type: "tool-name-delta",
                       toolCallId: toolCallId,
                       toolName: toolName,
@@ -536,7 +541,7 @@ export async function POST(req: Request) {
                 if (toolCallDelta.function?.arguments) {
                   toolCall.arguments += toolCallDelta.function.arguments;
 
-                  sendEvent({
+                  await sendEvent({
                     type: "tool-argument-delta",
                     toolCallId: toolCall.id,
                     delta: toolCallDelta.function.arguments,
@@ -573,7 +578,7 @@ export async function POST(req: Request) {
             const toolName =
               toolCall.name === "computer_use" ? "computer" : "bash";
 
-            sendEvent({
+            await sendEvent({
               type: "tool-input-available",
               toolCallId: toolCall.id,
               toolName: toolName,
@@ -635,7 +640,7 @@ WORKFLOW:
                           data: Buffer.from(screenshot).toString("base64"),
                         };
 
-                        sendEvent({
+                        await sendEvent({
                           type: "screenshot-update",
                           screenshot: Buffer.from(screenshot).toString("base64"),
                         });
@@ -763,11 +768,15 @@ WORKFLOW:
                       }
                     }
 
-                    sendEvent({
+                    await sendEvent({
                       type: "tool-output-available",
                       toolCallId: toolCall.id,
                       output: resultData,
                     });
+                    
+                    // SYNCHRONIZACJA: Czekaj żeby frontend zdążył wyrenderować task
+                    // Daje czas na streaming + rendering przed wykonaniem kolejnego tool call
+                    await new Promise(resolve => setTimeout(resolve, 600));
 
                     return {
                       tool_call_id: toolCall.id,
@@ -789,11 +798,14 @@ WORKFLOW:
                       commandResult.stderr ||
                       "(Command executed successfully with no output)";
 
-                    sendEvent({
+                    await sendEvent({
                       type: "tool-output-available",
                       toolCallId: toolCall.id,
                       output: { type: "text", text: output },
                     });
+                    
+                    // SYNCHRONIZACJA: Czekaj żeby frontend zdążył wyrenderować task
+                    await new Promise(resolve => setTimeout(resolve, 600));
 
                     return {
                       tool_call_id: toolCall.id,
@@ -827,10 +839,14 @@ WORKFLOW:
                     detailedError += '\n\nSuggestion: Bash command failed. Check the command syntax and try again.';
                   }
                   
-                  sendEvent({
+                  await sendEvent({
                     type: "error",
                     errorText: errorMsg,
                   });
+                  
+                  // SYNCHRONIZACJA: Czekaj po błędzie
+                  await new Promise(resolve => setTimeout(resolve, 600));
+                  
                   return {
                     tool_call_id: toolCall.id,
                     role: "tool",
@@ -946,7 +962,7 @@ WORKFLOW:
             }
 
             // Send finish event
-            sendEvent({
+            await sendEvent({
               type: "finish",
               content: fullText,
             });
@@ -964,7 +980,7 @@ WORKFLOW:
       } catch (error) {
         console.error("Chat API error:", error);
         await killDesktop(sandboxId);
-        sendEvent({
+        await sendEvent({
           type: "error",
           errorText: String(error),
         });
