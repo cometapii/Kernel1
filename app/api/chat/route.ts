@@ -955,43 +955,134 @@ WORKFLOW:
                 // Dodaj screenshot jako wiadomość użytkownika z obrazem dla AI
                 // Szczegółowe dane techniczne o screenshocie
                 const timestamp = new Date().toISOString();
+                const timestampUnix = Date.now();
                 const width = resolution.x;
                 const height = resolution.y;
                 const centerX = Math.floor(width / 2);
                 const centerY = Math.floor(height / 2);
+                
+                // Siatka 3x3 - granice i centra regionów
+                const vBounds = { top: 255, middle: 511 }; // bottom to 512-767
+                const hBounds = { left: 341, center: 682 }; // right to 683-1023
+                
+                // Centra wszystkich 9 regionów
+                const regionCenters = {
+                  topLeft: [Math.floor(170), Math.floor(128)],
+                  topCenter: [Math.floor(512), Math.floor(128)],
+                  topRight: [Math.floor(853), Math.floor(128)],
+                  middleLeft: [Math.floor(170), Math.floor(384)],
+                  middleCenter: [Math.floor(512), Math.floor(384)],
+                  middleRight: [Math.floor(853), Math.floor(384)],
+                  bottomLeft: [Math.floor(170), Math.floor(640)],
+                  bottomCenter: [Math.floor(512), Math.floor(640)],
+                  bottomRight: [Math.floor(853), Math.floor(640)]
+                };
                 
                 chatHistory.push({
                   role: "user",
                   content: [
                     {
                       type: "text",
-                      text: `SCREENSHOT DATA - Captured: ${timestamp}
+                      text: `╔═══════════════════════════════════════════════════════════════════════════╗
+║                    📸 SCREENSHOT METADATA - COMPLETE DATA                 ║
+╚═══════════════════════════════════════════════════════════════════════════╝
 
-Resolution: ${width} × ${height} pixels
-Total Pixels: ${width * height} (${(width * height / 1000000).toFixed(2)} megapixels)
-Aspect Ratio: ${(width / height).toFixed(4)}:1 (${width > height ? 'Landscape' : width < height ? 'Portrait' : 'Square'})
-Diagonal: ${Math.round(Math.sqrt(width * width + height * height))} pixels
-Format: PNG (24-bit RGB / 32-bit RGBA, 8 bits per channel)
+🕐 TIMESTAMP:
+  - ISO 8601: ${timestamp}
+  - Unix (ms): ${timestampUnix}
+  - Timezone: UTC
 
-Coordinate System:
-- Origin: (0, 0) at TOP-LEFT corner
-- X-axis: 0 to ${width - 1} (LEFT → RIGHT)
-- Y-axis: 0 to ${height - 1} (TOP → BOTTOM, inverted)
-- Center: (${centerX}, ${centerY})
+🖥️ SYSTEM INFORMATION:
+  - Operating System: Ubuntu 22.04 LTS (Jammy Jellyfish)
+  - Desktop Environment: GNOME/X11
+  - Platform: E2B Desktop Sandbox
+  - Architecture: x86_64
 
-Corner Coordinates:
-- TOP-LEFT: (0, 0)
-- TOP-RIGHT: (${width - 1}, 0)
-- BOTTOM-LEFT: (0, ${height - 1})
-- BOTTOM-RIGHT: (${width - 1}, ${height - 1})
+📐 RESOLUTION & FORMAT:
+  - Width: ${width} pixels
+  - Height: ${height} pixels
+  - Total Pixels: ${width * height} (${(width * height / 1000000).toFixed(2)} megapixels)
+  - Aspect Ratio: ${(width / height).toFixed(4)}:1 (4:3 format)
+  - Diagonal: ${Math.round(Math.sqrt(width * width + height * height))} pixels
+  - DPI/Scale: 100% (1:1 pixel ratio)
+  - Orientation: Landscape
 
-Edge Midpoints:
-- TOP: (${centerX}, 0)
-- BOTTOM: (${centerX}, ${height - 1})
-- LEFT: (0, ${centerY})
-- RIGHT: (${width - 1}, ${centerY})
+🎨 IMAGE FORMAT:
+  - Format: PNG (Portable Network Graphics)
+  - Color Model: RGB/RGBA
+  - Bit Depth: 24-bit (RGB) / 32-bit (RGBA)
+  - Channels: 3 (RGB) or 4 (RGBA with alpha)
+  - Bits per Channel: 8 bits
+  - Compression: Lossless (PNG deflate)
+  - Color Space: sRGB
 
-Note: All coordinates are integers. Y increases DOWNWARD.`,
+📊 COORDINATE SYSTEM - ABSOLUTE TRUTH:
+  - Origin: (0, 0) at TOP-LEFT corner
+  - X-axis Range: 0 to ${width - 1} (horizontal, LEFT → RIGHT)
+  - Y-axis Range: 0 to ${height - 1} (vertical, TOP → BOTTOM)
+  - Coordinate Format: [X, Y] - ALWAYS horizontal first, vertical second
+  - ⚠️ CRITICAL: Y=0 is at TOP, Y increases DOWNWARD (inverted Y-axis)
+  - Screen Center: [${centerX}, ${centerY}]
+
+📍 KEY COORDINATES:
+  Corner Points:
+    - TOP-LEFT:     [0, 0]
+    - TOP-RIGHT:    [${width - 1}, 0]
+    - BOTTOM-LEFT:  [0, ${height - 1}]
+    - BOTTOM-RIGHT: [${width - 1}, ${height - 1}]
+  
+  Edge Midpoints:
+    - TOP edge:    [${centerX}, 0]
+    - BOTTOM edge: [${centerX}, ${height - 1}]
+    - LEFT edge:   [0, ${centerY}]
+    - RIGHT edge:  [${width - 1}, ${centerY}]
+  
+  Screen Center: [${centerX}, ${centerY}]
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                  🎯 3×3 GRID REFERENCE SYSTEM (PRECISE)                   ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+GRID BOUNDARIES (exact pixel ranges):
+  Vertical Regions:
+    - TOP:    Y = 0 to ${vBounds.top} (256 pixels)
+    - MIDDLE: Y = ${vBounds.top + 1} to ${vBounds.middle} (256 pixels)
+    - BOTTOM: Y = ${vBounds.middle + 1} to ${height - 1} (256 pixels)
+  
+  Horizontal Regions:
+    - LEFT:   X = 0 to ${hBounds.left} (342 pixels)
+    - CENTER: X = ${hBounds.left + 1} to ${hBounds.center} (341 pixels)
+    - RIGHT:  X = ${hBounds.center + 1} to ${width - 1} (341 pixels)
+
+┌──────────────────┬──────────────────┬──────────────────┐
+│   TOP-LEFT       │   TOP-CENTER     │   TOP-RIGHT      │
+│   Region: [0-341,│   Region: [342-  │   Region: [683-  │
+│            0-255] │   682, 0-255]    │   1023, 0-255]   │
+│   Center: [${regionCenters.topLeft[0]}, ${regionCenters.topLeft[1]}]│   Center: [${regionCenters.topCenter[0]}, ${regionCenters.topCenter[1]}] │   Center: [${regionCenters.topRight[0]}, ${regionCenters.topRight[1]}]  │
+├──────────────────┼──────────────────┼──────────────────┤
+│  MIDDLE-LEFT     │  MIDDLE-CENTER   │  MIDDLE-RIGHT    │
+│  Region: [0-341, │  Region: [342-   │  Region: [683-   │
+│          256-511]│  682, 256-511]   │  1023, 256-511]  │
+│  Center: [${regionCenters.middleLeft[0]}, ${regionCenters.middleLeft[1]}]│  Center: [${regionCenters.middleCenter[0]}, ${regionCenters.middleCenter[1]}] │  Center: [${regionCenters.middleRight[0]}, ${regionCenters.middleRight[1]}]  │
+├──────────────────┼──────────────────┼──────────────────┤
+│  BOTTOM-LEFT     │  BOTTOM-CENTER   │  BOTTOM-RIGHT    │
+│  Region: [0-341, │  Region: [342-   │  Region: [683-   │
+│          512-767]│  682, 512-767]   │  1023, 512-767]  │
+│  Center: [${regionCenters.bottomLeft[0]}, ${regionCenters.bottomLeft[1]}]│  Center: [${regionCenters.bottomCenter[0]}, ${regionCenters.bottomCenter[1]}] │  Center: [${regionCenters.bottomRight[0]}, ${regionCenters.bottomRight[1]}]  │
+└──────────────────┴──────────────────┴──────────────────┘
+
+⚠️  COORDINATE VALIDATION RULES:
+  1. Valid X range: 0 ≤ X ≤ ${width - 1}
+  2. Valid Y range: 0 ≤ Y ≤ ${height - 1}
+  3. Format: ALWAYS [X, Y] - horizontal first, vertical second
+  4. Y=0 is TOP (not bottom!) - Y increases DOWNWARD
+  5. All coordinates MUST be integers (no decimals)
+
+💡 USAGE TIPS:
+  - Use region centers as reference points for clicking
+  - Always verify element position before clicking
+  - Remember: Small Y = top of screen, Large Y = bottom of screen
+  - Use screenshot to verify coordinates before each action`,
                     },
                     {
                       type: "image_url",
