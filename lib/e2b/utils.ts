@@ -5,7 +5,7 @@ import { Stagehand } from "@browserbasehq/stagehand";
 import { resolution } from "./tool";
 
 const KERNEL_API_KEY = "sk_bb9ec7e8-9e45-42a5-9d68-72736f11ef05.ffpPsG9fh2Gh+g1uWxA1U8+d7PW29Kpjiqm1+/XlBWk";
-const GOOGLE_API_KEY = "AIzaSyBBIoNEFvRLhApDBBaDSEZeenDEVg4ar6U";
+const GOOGLE_API_KEY = "AIzaSyAUBm-ZbGN5GK86mtwi0Sj3o__kO5pG4Gw";
 
 // Global storage for browser sessions
 const browserSessions = new Map<string, {
