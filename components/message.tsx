@@ -218,7 +218,7 @@ const ComputerInvocation = memo(function ComputerInvocation({
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg bg-zinc-50/30 px-3.5 py-3 dark:bg-white/[0.02]">
+    <div className="flex flex-col gap-3 rounded-lg px-3.5 py-3" style={{ backgroundColor: 'var(--user-bubble-bg)' }}>
       <div className="flex items-center gap-2.5">
         {IconComponent ? <IconComponent className="h-[18px] w-[18px] shrink-0 text-zinc-500 dark:text-zinc-400" aria-hidden="true" /> : null}
         <div className="flex-1 min-w-0">
@@ -270,7 +270,7 @@ function BashInvocation({
   const statusIcon = renderInvocationStatus(state, isLatestMessage, status, result);
 
   return (
-    <div className="flex items-center gap-2.5 rounded-lg bg-zinc-50/30 px-3.5 py-3 dark:bg-white/[0.02]">
+    <div className="flex items-center gap-2.5 rounded-lg px-3.5 py-3" style={{ backgroundColor: 'var(--user-bubble-bg)' }}>
       <ScrollText className="h-[18px] w-[18px] shrink-0 text-zinc-500 dark:text-zinc-400" aria-hidden="true" />
       <div className="flex-1 min-w-0">
         <div className="flex flex-col gap-0.5">
@@ -298,7 +298,7 @@ function GenericInvocation({
   const statusIcon = renderInvocationStatus(state, isLatestMessage, status, result);
 
   return (
-    <div className="rounded-lg bg-zinc-50/30 px-3.5 py-3 dark:bg-white/[0.02]">
+    <div className="rounded-lg px-3.5 py-3" style={{ backgroundColor: 'var(--user-bubble-bg)' }}>
       <div className="flex items-center gap-2.5 mb-2.5">
         <div className="text-[11px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{toolName}</div>
         <div className="ml-auto flex items-center justify-center shrink-0">{statusIcon}</div>
