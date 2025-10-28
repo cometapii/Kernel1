@@ -3,7 +3,7 @@ import { killDesktop, getDesktop } from "@/lib/e2b/utils";
 import { resolution } from "@/lib/e2b/tool";
 
 // Google Generative Language API Configuration - HARDCODED
-const GOOGLE_API_KEY = "AIzaSyC8KuasgEalUItEKxjjjwS_IwssS2jR3rk";
+const GOOGLE_API_KEY = "AIzaSyBBIoNEFvRLhApDBBaDSEZeenDEVg4ar6U";
 const GOOGLE_MODEL = "gemini-2.0-flash";
 
 // KLUCZOWE: Używamy Node.js runtime zamiast Edge dla prawdziwego streamingu
