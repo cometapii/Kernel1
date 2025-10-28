@@ -1,6 +1,6 @@
 # Operator - Computer Use AI Assistant
 
-> Asystent AI kontrolujący komputer poprzez Next.js, E2B Desktop i Azure OpenAI
+> Asystent AI kontrolujący przeglądarkę poprzez Next.js, Kernel Browsers i Google Gemini
 
 ## 📁 Struktura Projektu
 
@@ -11,7 +11,7 @@ operator/
 │   │   ├── chat/         # Główny endpoint streamu
 │   │   ├── db-query/     # Zapytania do bazy
 │   │   ├── db-test/      # Testy bazy
-│   │   └── kill-desktop/ # Zabijanie sesji E2B
+│   │   └── kill-desktop/ # Zabijanie sesji Kernel
 │   ├── globals.css       # Style globalne
 │   ├── layout.tsx        # Layout aplikacji
 │   └── page.tsx          # Strona główna
@@ -24,9 +24,9 @@ operator/
 │   └── ...               # Komponenty cache-busting
 │
 ├── lib/                   # Biblioteki i utilities
-│   ├── e2b/              # Integracja E2B Desktop
+│   ├── e2b/              # Integracja Kernel (nazwa folderu zachowana)
 │   │   ├── tool.ts       # Definicja narzędzi computer
-│   │   └── utils.ts      # Utilities E2B
+│   │   └── utils.ts      # Utilities Kernel
 │   ├── use-custom-chat.ts    # Hook czatu z flushSync
 │   ├── streaming-config.ts   # Konfiguracja streamingu
 │   └── utils.ts          # Ogólne utility
@@ -59,13 +59,11 @@ cp .env.example .env.local
 Uzupełnij zmienne środowiskowe:
 
 ```env
-AZURE_OPENAI_ENDPOINT=https://your-endpoint.cognitiveservices.azure.com/
-AZURE_OPENAI_API_KEY=twój-klucz-api
-AZURE_OPENAI_DEPLOYMENT=gpt-4.1-mini
-AZURE_API_VERSION=2024-12-01-preview
-
-E2B_API_KEY=twój-klucz-e2b
+GOOGLE_API_KEY=twój-klucz-google-gemini
+KERNEL_API_KEY=twój-klucz-kernel
 ```
+
+**Uwaga:** Klucz Kernel API jest obecnie hardcodowany w pliku `lib/e2b/utils.ts`.
 
 ### 3. Uruchomienie
 

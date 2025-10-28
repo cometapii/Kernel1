@@ -59,7 +59,7 @@ export const getDesktop = async (id?: string) => {
     const session = {
       sessionId: kernelBrowser.session_id,
       cdpUrl: kernelBrowser.cdp_ws_url,
-      liveViewUrl: kernelBrowser.browser_live_view_url,
+      liveViewUrl: kernelBrowser.browser_live_view_url || '',
       page,
       browser,
     };
@@ -172,7 +172,7 @@ function createDesktopAPI(session: {
       }
     },
     isRunning: async () => {
-      return browser.isConnected();
+      return session.browser.isConnected();
     },
     kill: async () => {
       await killDesktop(sessionId);
