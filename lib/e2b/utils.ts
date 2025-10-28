@@ -93,10 +93,10 @@ function createDesktopAPI(session: {
     },
     screenshot: async () => {
       const screenshot = await page.screenshot({
-        encoding: 'base64',
+        encoding: 'binary',
         fullPage: false,
       });
-      return screenshot;
+      return Buffer.from(screenshot);
     },
     leftClick: async (x: number, y: number) => {
       await page.mouse.click(x, y);
