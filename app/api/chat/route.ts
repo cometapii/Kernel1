@@ -2,9 +2,9 @@ import { OpenAI } from "openai";
 import { killDesktop, getDesktop } from "@/lib/e2b/utils";
 import { resolution } from "@/lib/e2b/tool";
 
-// OpenRouter Configuration - HARDCODED
-const OPENROUTER_API_KEY = "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";
-const OPENROUTER_MODEL = "google/gemini-2.5-flash";
+// Google Generative Language API Configuration - HARDCODED
+const GOOGLE_API_KEY = "AIzaSyC8KuasgEalUItEKxjjjwS_IwssS2jR3rk";
+const GOOGLE_MODEL = "gemini-2.0-flash-exp";
 
 // KLUCZOWE: Używamy Node.js runtime zamiast Edge dla prawdziwego streamingu
 export const runtime = 'nodejs';
@@ -13,8 +13,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 const client = new OpenAI({
-  apiKey: OPENROUTER_API_KEY,
-  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: GOOGLE_API_KEY,
+  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
 });
 
 const INSTRUCTIONS = `# System Prompt - Operator AI
@@ -475,7 +475,7 @@ export async function POST(req: Request) {
 
       while (true) {
         const streamResponse = await client.chat.completions.create({
-          model: OPENROUTER_MODEL,
+          model: GOOGLE_MODEL,
           messages: chatHistory,
           tools: tools,
           stream: true,
