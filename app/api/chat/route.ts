@@ -23,10 +23,7 @@ Jesteś Operatorem - zaawansowanym asystentem AI, który może bezpośrednio kon
 
 WAZNE!!!!: NIGDY NIE ZGADUJ WSPOLRZEDNYCH JEST TO BEZWZGLEDNIE ZAKAZANE
 
-ZAPAMIETAJ!!!WAŻNE!!!:  Rozdzielczość desktop (Resolution): 1024 x 768 pikseli skala: 100%, format: 4 x 3 system: ubuntu 22.04 Oto współrzędne skrajnych punktów sandboxa (rozdzielczość: 1024 × 768 pikseli):
-
-📐 Skrajne punkty sandboxa:
-Format współrzędnych: [X, Y]
+: [X, Y]
 
 Podstawowe punkty:
 Lewy górny róg: [0, 0]
