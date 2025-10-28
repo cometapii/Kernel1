@@ -23,68 +23,11 @@ Jesteś Operatorem - zaawansowanym asystentem AI, który może bezpośrednio kon
 
 WAZNE!!!!: NIGDY NIE ZGADUJ WSPOLRZEDNYCH JEST TO BEZWZGLEDNIE ZAKAZANE
 
-: [X, Y]
-
-Podstawowe punkty:
-Lewy górny róg: [0, 0]
-Prawy górny róg: [1023, 0]
-Lewy dolny róg: [0, 767]
-Prawy dolny róg: [1023, 767]
-Środek ekranu: [512, 384]
-Skrajne granice:
-Góra: Y = 0 (cały górny brzeg)
-Dół: Y = 767 (cały dolny brzeg)
-Lewo: X = 0 (cała lewa krawędź)
-Prawo: X = 1023 (cała prawa krawędź)
-Zakresy:
-X (poziomo): 0 → 1023 (lewo → prawo)
-Y (pionowo): 0 → 767 (góra → dół)
-Ważne: Y = 0 to GÓRA ekranu, a Y = 767 to DÓŁ. Współrzędne zawsze podawane w formacie [X, Y] - najpierw poziomo, potem pionowo.
-
-
-
-
 WAŻNE!!!!: MUSISZ BARDZO CZESTO ROBIC ZRZUTY EKRANU BY SPRAWDZAC STAN SANDBOXA - NAJLEPIEJ CO AKCJE!!! ZAWSZE PO KAZDEJ AKCJI ROB ZRZUT EKRANU MUSISZ KONTROLOWAC STAN SANDBOXA
 
 WAŻNE!!!!: ZAWSZE ZACZYNAJ KAZDEGO TASKA OD WYSLANIA WIADOMOSCI A PO WYSLANIU WIADOMOSCI MUSISZ ZROBIC PIERWSZY ZRZUT EKRANU BY SPRAWDZIC STAN DESKTOPA
 
 WAŻNE!!!!: PRZEGLADARKA ZNAJDUJE SIE POD IKONA GLOBU
-
-═══════════════════════════════════════════════════════════════════════════
-🎯 COORDINATE CHECKLIST - OBOWIĄZKOWE PRZED KAŻDYM KLIKNIĘCIEM!
-═══════════════════════════════════════════════════════════════════════════
-
-**PRZED każdym left_click, right_click, double_click, mouse_move MUSISZ:**
-
-1. **Sprawdź LOGIKĘ współrzędnych:**
-   - Element NA GÓRZE ekranu → Y MUSI być MAŁY (bliżej 0)
-   - Element NA DOLE ekranu → Y MUSI być DUŻY (bliżej 767)
-   - Element PO LEWEJ → X MUSI być MAŁY (bliżej 0)
-   - Element PO PRAWEJ → X MUSI być DUŻY (bliżej 1023)
-
-2. **Weryfikuj FORMAT [X, Y]:**
-   - ZAWSZE [X, Y] - poziomo, potem pionowo
-   - NIGDY [Y, X] - to najczęstszy błąd!
-   - X = lewo→prawo (0→1023)
-   - Y = góra→dół (0→767) - **Y=0 to GÓRA, nie dół!**
-
-3. **Celuj w CENTRUM elementu:**
-   - Nie klikaj w krawędzie
-   - Dla przycisków: środek tekstu
-   - Dla pól: środek pola
-
-**PRZYKŁAD POPRAWNEGO ROZUMOWANIA:**
-- Widzę przycisk u góry po lewej → Y ≈ 100, X ≈ 150 → [150, 100] ✅
-- Widzę przycisk na dole po prawej → Y ≈ 700, X ≈ 900 → [900, 700] ✅
-
-**CZĘSTE BŁĘDY - ABSOLUTNIE UNIKAJ:**
-❌ Pasek adresu (góra) → [60, 700] - ZŁE! Góra to MAŁY Y!
-✅ Pasek adresu (góra) → [512, 60] - DOBRZE!
-
-❌ Dock (dół) → [512, 40] - ZŁE! Dół to DUŻY Y!
-✅ Dock (dół) → [512, 740] - DOBRZE!
-
-═══════════════════════════════════════════════════════════════════════════ 
 
 ✳️ STYL I OSOBOWOŚĆ:
 
@@ -352,7 +295,7 @@ const tools = [
           coordinate: {
             type: "array",
             items: { type: "number" },
-            description: "X,Y coordinates for actions that require positioning. MUST be [X, Y] format (horizontal, then vertical). X: 0-1023, Y: 0-767. Remember: Y=0 is TOP of screen!",
+            description: "X,Y coordinates for actions that require positioning. MUST be [X, Y] format (horizontal, then vertical). Y=0 is TOP of screen!",
           },
           text: {
             type: "string",
@@ -596,14 +539,14 @@ export async function POST(req: Request) {
                       const coordinate = parsedArgs.coordinate;
 
                       if (!coordinate || coordinate.length !== 2) {
-                        throw new Error(`❌ BŁĄD WSPÓŁRZĘDNYCH: Brakujące lub nieprawidłowe współrzędne. Wymagany format: [X, Y] gdzie X=0-1023, Y=0-767.`);
+                        throw new Error(`❌ BŁĄD WSPÓŁRZĘDNYCH: Brakujące lub nieprawidłowe współrzędne. Wymagany format: [X, Y].`);
                       }
 
                       const [x, y] = coordinate;
 
                       // Sprawdzenie zakresu
-                      if (x < 0 || x > 1023 || y < 0 || y > 767) {
-                        throw new Error(`❌ BŁĄD WSPÓŁRZĘDNYCH: Współrzędne [${x}, ${y}] są poza zakresem ekranu! Zakres: X=0-1023, Y=0-767. Pamiętaj: Y=0 to GÓRA ekranu!`);
+                      if (x < 0 || x > resolution.x - 1 || y < 0 || y > resolution.y - 1) {
+                        throw new Error(`❌ BŁĄD WSPÓŁRZĘDNYCH: Współrzędne [${x}, ${y}] są poza zakresem ekranu! Zakres: X=0-${resolution.x - 1}, Y=0-${resolution.y - 1}. Pamiętaj: Y=0 to GÓRA ekranu!`);
                       }
                     }
 
@@ -848,81 +791,12 @@ Resolution: ${width}×${height}px | Coordinates: [X, Y] format | Range: X(0-${wi
                 });
                 
                 // Dodaj screenshot jako wiadomość użytkownika z obrazem dla AI
-                // Szczegółowe dane techniczne o screenshocie
-                const timestamp = new Date().toISOString();
-                const timestampUnix = Date.now();
-                const width = resolution.x;
-                const height = resolution.y;
-                const centerX = Math.floor(width / 2);
-                const centerY = Math.floor(height / 2);
-                
                 chatHistory.push({
                   role: "user",
                   content: [
                     {
                       type: "text",
-                      text: `╔═══════════════════════════════════════════════════════════════════════════╗
-║                    📸 SCREENSHOT METADATA - COMPLETE DATA                 ║
-╚═══════════════════════════════════════════════════════════════════════════╝
-
-🕐 TIMESTAMP:
-  - ISO 8601: ${timestamp}
-  - Unix (ms): ${timestampUnix}
-  - Timezone: UTC
-
-🖥️ SYSTEM INFORMATION:
-  - Operating System: Ubuntu 22.04 LTS (Jammy Jellyfish)
-  - Desktop Environment: GNOME/X11
-  - Platform: E2B Desktop Sandbox
-  - Architecture: x86_64
-
-📐 RESOLUTION & FORMAT:
-  - Width: ${width} pixels
-  - Height: ${height} pixels
-  - Total Pixels: ${width * height} (${(width * height / 1000000).toFixed(2)} megapixels)
-  - Aspect Ratio: ${(width / height).toFixed(4)}:1 (4:3 format)
-  - Diagonal: ${Math.round(Math.sqrt(width * width + height * height))} pixels
-  - DPI/Scale: 100% (1:1 pixel ratio)
-  - Orientation: Landscape
-
-🎨 IMAGE FORMAT:
-  - Format: PNG (Portable Network Graphics)
-  - Color Model: RGB/RGBA
-  - Bit Depth: 24-bit (RGB) / 32-bit (RGBA)
-  - Channels: 3 (RGB) or 4 (RGBA with alpha)
-  - Bits per Channel: 8 bits
-  - Compression: Lossless (PNG deflate)
-  - Color Space: sRGB
-
-📊 COORDINATE SYSTEM:
-  - Origin: (0, 0) at TOP-LEFT corner
-  - X-axis Range: 0 to ${width - 1} (horizontal, LEFT → RIGHT)
-  - Y-axis Range: 0 to ${height - 1} (vertical, TOP → BOTTOM)
-  - Coordinate Format: [X, Y] - ALWAYS horizontal first, vertical second
-  - ⚠️ CRITICAL: Y=0 is at TOP, Y increases DOWNWARD (inverted Y-axis)
-  - Screen Center: [${centerX}, ${centerY}]
-
-📍 KEY COORDINATES:
-  Corner Points:
-    - TOP-LEFT:     [0, 0]
-    - TOP-RIGHT:    [${width - 1}, 0]
-    - BOTTOM-LEFT:  [0, ${height - 1}]
-    - BOTTOM-RIGHT: [${width - 1}, ${height - 1}]
-  
-  Edge Midpoints:
-    - TOP edge:    [${centerX}, 0]
-    - BOTTOM edge: [${centerX}, ${height - 1}]
-    - LEFT edge:   [0, ${centerY}]
-    - RIGHT edge:  [${width - 1}, ${centerY}]
-  
-  Screen Center: [${centerX}, ${centerY}]
-
-⚠️  COORDINATE VALIDATION RULES:
-  1. Valid X range: 0 ≤ X ≤ ${width - 1}
-  2. Valid Y range: 0 ≤ Y ≤ ${height - 1}
-  3. Format: ALWAYS [X, Y] - horizontal first, vertical second
-  4. Y=0 is TOP (not bottom!) - Y increases DOWNWARD
-  5. All coordinates MUST be integers (no decimals)`,
+                      text: `Screenshot captured`,
                     },
                     {
                       type: "image_url",
