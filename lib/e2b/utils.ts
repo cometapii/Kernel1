@@ -3,7 +3,7 @@
 import { Sandbox } from "@e2b/desktop";
 import { resolution } from "./tool";
 
-const E2B_API_KEY = "e2b_b9516dc4ffb6023ab76ecf5ca58cc596d7a9bdd0";
+const E2B_API_KEY = "e2b_038bb166414f36a1315acd4a28f7a3e3eaa03b78";
 
 export const getDesktop = async (id?: string) => {
   try {
