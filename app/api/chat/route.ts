@@ -4,7 +4,7 @@ import { resolution } from "@/lib/e2b/tool";
 
 // Google Generative Language API Configuration - HARDCODED
 const GOOGLE_API_KEY = "AIzaSyBBIoNEFvRLhApDBBaDSEZeenDEVg4ar6U";
-const GOOGLE_MODEL = "gemini-2.5-flash";
+const GOOGLE_MODEL = "gemini-2.0-flash";
 
 // KLUCZOWE: Używamy Node.js runtime zamiast Edge dla prawdziwego streamingu
 export const runtime = 'nodejs';
@@ -554,12 +554,7 @@ export async function POST(req: Request) {
                       case "screenshot": {
                         const screenshot = await desktop.screenshot();
                         
-                        const timestamp = new Date().toISOString();
-                        const width = resolution.x;
-                        const height = resolution.y;
-                        
-                        resultText = `Screenshot taken at ${timestamp}
-Resolution: ${width}×${height}px | Coordinates: [X, Y] format | Range: X(0-${width-1}), Y(0-${height-1})`;
+                        resultText = `Screenshot taken`;
                         
                         resultData = {
                           type: "image",
