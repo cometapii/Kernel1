@@ -58,19 +58,19 @@ type ComputerActionDescriptor = {
 };
 
 const streamingSpinner = (
-  <Loader2 className="h-4 w-4 animate-spin text-blue-500" aria-hidden="true" />
+  <Loader2 className="h-4 w-4 animate-spin text-zinc-400 dark:text-zinc-500" aria-hidden="true" />
 );
 
 const idleSpinner = (
-  <Loader2 className="h-4 w-4 animate-spin text-zinc-500" aria-hidden="true" />
+  <Loader2 className="h-4 w-4 animate-spin text-zinc-300 dark:text-zinc-600" aria-hidden="true" />
 );
 
 const abortedIcon = (
-  <CircleSlash className="h-4 w-4 text-amber-600" aria-hidden="true" />
+  <CircleSlash className="h-4 w-4 text-zinc-400 dark:text-zinc-500" aria-hidden="true" />
 );
 
 const completedIcon = (
-  <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+  <CheckCircle className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden="true" />
 );
 
 function formatCoordinate(value?: number[]) {
@@ -184,7 +184,7 @@ function renderInvocationStatus(
   }
 
   if (state === "call") {
-    return isLatestMessage && chatStatus !== "ready" ? idleSpinner : <div className="h-4 w-4 bg-red-500 rounded-sm" aria-hidden="true" />;
+    return isLatestMessage && chatStatus !== "ready" ? idleSpinner : <div className="h-4 w-4 bg-zinc-400 dark:bg-zinc-500 rounded-full" aria-hidden="true" />;
   }
 
   if (state === "result") {
@@ -218,16 +218,16 @@ const ComputerInvocation = memo(function ComputerInvocation({
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200/60 bg-zinc-50/50 p-4 text-sm dark:border-zinc-800/60 dark:bg-zinc-900/50 backdrop-blur-sm">
       <div className="flex items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-          {IconComponent ? <IconComponent className="h-4 w-4" aria-hidden="true" /> : null}
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100/80 dark:bg-zinc-800/80">
+          {IconComponent ? <IconComponent className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden="true" /> : null}
         </div>
         <div className="flex-1">
-          <div className="flex flex-wrap items-baseline gap-2 font-mono text-sm2 font-medium">
-            <span>{descriptor.label}</span>
+          <div className="flex flex-wrap items-baseline gap-2 text-sm font-medium">
+            <span className="text-zinc-700 dark:text-zinc-300">{descriptor.label}</span>
             {descriptor.detail ? (
-              <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">{descriptor.detail}</span>
+              <span className="text-xs font-normal text-zinc-400 dark:text-zinc-500">{descriptor.detail}</span>
             ) : null}
           </div>
         </div>
@@ -237,7 +237,7 @@ const ComputerInvocation = memo(function ComputerInvocation({
       </div>
 
       {state === "result" && result?.type === "image" && result?.data ? (
-        <div className="overflow-hidden rounded-sm">
+        <div className="overflow-hidden rounded-xl">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             ref={imgRef}
@@ -272,16 +272,16 @@ function BashInvocation({
   const statusIcon = renderInvocationStatus(state, isLatestMessage, status, result);
 
   return (
-    <div className="flex items-center gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-        <ScrollText className="h-4 w-4" aria-hidden="true" />
+    <div className="flex items-center gap-3 rounded-2xl border border-zinc-200/60 bg-zinc-50/50 p-4 text-sm dark:border-zinc-800/60 dark:bg-zinc-900/50 backdrop-blur-sm">
+      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100/80 dark:bg-zinc-800/80">
+        <ScrollText className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden="true" />
       </div>
       <div className="flex-1">
         <div className="flex flex-col">
-          <span className="font-mono text-sm font-medium">
+          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
             {state === "streaming" ? "Generating command" : "Running command"}
           </span>
-          <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400">{displayCommand}</span>
+          <span className="text-xs text-zinc-400 dark:text-zinc-500">{displayCommand}</span>
         </div>
       </div>
       <div className="flex h-5 w-5 items-center justify-center">{statusIcon}</div>
@@ -302,12 +302,12 @@ function GenericInvocation({
   const statusIcon = renderInvocationStatus(state, isLatestMessage, status, result);
 
   return (
-    <div className="rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="flex items-center2 gap-3">
-        <div className="font-mono text-xs uppercase text-zinc-500">{toolName}</div>
+    <div className="rounded-2xl border border-zinc-200/60 bg-zinc-50/50 p-4 text-sm dark:border-zinc-800/60 dark:bg-zinc-900/50 backdrop-blur-sm">
+      <div className="flex items-center gap-3">
+        <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{toolName}</div>
         <div className="ml-auto flex h-5 w-5 items-center justify-center">{statusIcon}</div>
       </div>
-      <pre className="mt-2 overflow-x-auto rounded bg-zinc-900/5 p-3 text-xs text-zinc-700 dark:bg-white/5 dark:text-zinc-200">
+      <pre className="mt-3 overflow-x-auto rounded-xl bg-zinc-100/50 p-3 text-xs text-zinc-600 dark:bg-zinc-800/50 dark:text-zinc-300">
         {JSON.stringify(args, null, 2)}
       </pre>
     </div>
