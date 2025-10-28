@@ -20,12 +20,21 @@ export const BotIcon = () => {
 };
 
 export const AISDKLogo = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.location.href = '/';
+  };
+
   return (
     <div className="flex justify-between items-center">
       <div className="flex flex-row items-center gap-2 shrink-0 ">
         <span className="flex flex-row items-center gap-2 home-links">
           <div className="flex flex-row items-center gap-4">
-            <Link className="flex flex-row items-center gap-2" href="/">
+            <Link 
+              className="flex flex-row items-center gap-2 cursor-pointer" 
+              href="/"
+              onClick={handleClick}
+            >
               <div className="flex flex-row items-center gap-2">
                 <div className="text-xl font-bold text-zinc-800 dark:text-zinc-100">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" width="100" height="33">
