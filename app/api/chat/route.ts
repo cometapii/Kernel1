@@ -619,21 +619,7 @@ export async function POST(req: Request) {
                         const height = resolution.y;
                         
                         resultText = `Screenshot taken at ${timestamp}
-
-SCREEN: ${width}×${height} pixels | Aspect ratio: 4:3 | Origin: (0,0) at TOP-LEFT
-⚠️  REMEMBER: Y=0 is at TOP, Y increases DOWNWARD (0→767)
-⚠️  FORMAT: [X, Y] - horizontal first, then vertical
-
-CORNER COORDINATES:
-• Top-left: (0, 0)        • Top-right: (1023, 0)
-• Bottom-left: (0, 767)   • Bottom-right: (1023, 767)
-• Center: (512, 384)
-
-WORKFLOW:
-1. Look at screenshot - identify element position
-2. Estimate coordinates based on visual position
-3. Adjust to center of actual element
-4. Double-check: Y=0 is TOP, Y=767 is BOTTOM`;
+Resolution: ${width}×${height}px | Coordinates: [X, Y] format | Range: X(0-${width-1}), Y(0-${height-1})`;
                         
                         resultData = {
                           type: "image",
