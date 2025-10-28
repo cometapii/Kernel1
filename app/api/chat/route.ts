@@ -54,43 +54,38 @@ WAŻNE!!!!: ZAWSZE ZACZYNAJ KAZDEGO TASKA OD WYSLANIA WIADOMOSCI A PO WYSLANIU W
 WAŻNE!!!!: PRZEGLADARKA ZNAJDUJE SIE POD IKONA GLOBU
 
 ═══════════════════════════════════════════════════════════════════════════
-🎯 COORDINATE SANITY CHECKLIST - OBOWIĄZKOWE PRZED KAŻDYM KLIKNIĘCIEM!
+🎯 COORDINATE CHECKLIST - OBOWIĄZKOWE PRZED KAŻDYM KLIKNIĘCIEM!
 ═══════════════════════════════════════════════════════════════════════════
 
 **PRZED każdym left_click, right_click, double_click, mouse_move MUSISZ:**
 
-1. **Określ REGION docelowy** (WYMAGANE w parametrze target_region):
-   - Pionowo: "top" (Y: 0-255), "middle" (Y: 256-511), "bottom" (Y: 512-767)
-   - Poziomo: "left" (X: 0-341), "center" (X: 342-682), "right" (X: 683-1023)
-   - Format: "vertical-horizontal" np. "top-left", "middle-center", "bottom-right"
+1. **Sprawdź LOGIKĘ współrzędnych:**
+   - Element NA GÓRZE ekranu → Y MUSI być MAŁY (bliżej 0)
+   - Element NA DOLE ekranu → Y MUSI być DUŻY (bliżej 767)
+   - Element PO LEWEJ → X MUSI być MAŁY (bliżej 0)
+   - Element PO PRAWEJ → X MUSI być DUŻY (bliżej 1023)
 
-2. **Sprawdź LOGIKĘ współrzędnych:**
-   - Element NA GÓRZE ekranu → Y MUSI być MAŁY (0-255) - NIE 500+!
-   - Element NA DOLE ekranu → Y MUSI być DUŻY (512-767) - NIE 100!
-   - Element PO LEWEJ → X MUSI być MAŁY (0-341) - NIE 700!
-   - Element PO PRAWEJ → X MUSI być DUŻY (683-1023) - NIE 200!
-
-3. **Weryfikuj FORMAT [X, Y]:**
+2. **Weryfikuj FORMAT [X, Y]:**
    - ZAWSZE [X, Y] - poziomo, potem pionowo
    - NIGDY [Y, X] - to najczęstszy błąd!
    - X = lewo→prawo (0→1023)
    - Y = góra→dół (0→767) - **Y=0 to GÓRA, nie dół!**
 
-4. **Celuj w CENTRUM elementu:**
+3. **Celuj w CENTRUM elementu:**
    - Nie klikaj w krawędzie
    - Dla przycisków: środek tekstu
    - Dla pól: środek pola
 
 **PRZYKŁAD POPRAWNEGO ROZUMOWANIA:**
-- Widzę przycisk u góry po lewej → Region: "top-left" → Y ≈ 100, X ≈ 150 → [150, 100] ✅
-- Widzę przycisk na dole po prawej → Region: "bottom-right" → Y ≈ 700, X ≈ 900 → [900, 700] ✅
+- Widzę przycisk u góry po lewej → Y ≈ 100, X ≈ 150 → [150, 100] ✅
+- Widzę przycisk na dole po prawej → Y ≈ 700, X ≈ 900 → [900, 700] ✅
 
 **CZĘSTE BŁĘDY - ABSOLUTNIE UNIKAJ:**
-❌ Pasek adresu (górę) → [60, 700] - ZŁE! Góra to MAŁY Y!
-✅ Pasek adresu (góra) → Region: "top-center", [512, 60] - DOBRZE!
+❌ Pasek adresu (góra) → [60, 700] - ZŁE! Góra to MAŁY Y!
+✅ Pasek adresu (góra) → [512, 60] - DOBRZE!
 
 ❌ Dock (dół) → [512, 40] - ZŁE! Dół to DUŻY Y!
-✅ Dock (dół) → Region: "bottom-center", [512, 740] - DOBRZE!
+✅ Dock (dół) → [512, 740] - DOBRZE!
 
 ═══════════════════════════════════════════════════════════════════════════ 
 
@@ -359,11 +354,6 @@ const tools = [
             items: { type: "number" },
             description: "X,Y coordinates for actions that require positioning. MUST be [X, Y] format (horizontal, then vertical). X: 0-1023, Y: 0-767. Remember: Y=0 is TOP of screen!",
           },
-          target_region: {
-            type: "string",
-            description: "REQUIRED for click/move actions. Declare target region using format 'vertical-horizontal' (e.g., 'top-left', 'middle-center', 'bottom-right'). Vertical: top (Y:0-255), middle (Y:256-511), bottom (Y:512-767). Horizontal: left (X:0-341), center (X:342-682), right (X:683-1023). This is used to validate coordinates match the intended region.",
-            enum: ["top-left", "top-center", "top-right", "middle-left", "middle-center", "middle-right", "bottom-left", "bottom-center", "bottom-right"],
-          },
           text: {
             type: "string",
             description: "Text to type or key to press",
@@ -599,7 +589,6 @@ export async function POST(req: Request) {
                     // Walidacja współrzędnych dla akcji kliknięcia/przesuwania
                     if (["left_click", "right_click", "double_click", "mouse_move"].includes(action)) {
                       const coordinate = parsedArgs.coordinate;
-                      const targetRegion = parsedArgs.target_region;
 
                       if (!coordinate || coordinate.length !== 2) {
                         throw new Error(`❌ BŁĄD WSPÓŁRZĘDNYCH: Brakujące lub nieprawidłowe współrzędne. Wymagany format: [X, Y] gdzie X=0-1023, Y=0-767.`);
@@ -611,115 +600,21 @@ export async function POST(req: Request) {
                       if (x < 0 || x > 1023 || y < 0 || y > 767) {
                         throw new Error(`❌ BŁĄD WSPÓŁRZĘDNYCH: Współrzędne [${x}, ${y}] są poza zakresem ekranu! Zakres: X=0-1023, Y=0-767. Pamiętaj: Y=0 to GÓRA ekranu!`);
                       }
-
-                      // Walidacja target_region
-                      if (!targetRegion) {
-                        throw new Error(`❌ BRAK target_region: Musisz podać target_region dla akcji ${action}. Użyj formatu 'vertical-horizontal' np. 'top-left', 'middle-center', 'bottom-right'.`);
-                      }
-
-                      // Określenie regionu na podstawie współrzędnych
-                      const actualVertical = y <= 255 ? "top" : y <= 511 ? "middle" : "bottom";
-                      const actualHorizontal = x <= 341 ? "left" : x <= 682 ? "center" : "right";
-                      const actualRegion = `${actualVertical}-${actualHorizontal}`;
-
-                      // Sprawdzenie zgodności
-                      if (actualRegion !== targetRegion) {
-                        const [declaredVert, declaredHoriz] = targetRegion.split('-');
-                        let errorMsg = `❌ NIEZGODNOŚĆ WSPÓŁRZĘDNYCH:\n\n`;
-                        errorMsg += `Zadeklarowałeś region: "${targetRegion}"\n`;
-                        errorMsg += `Ale współrzędne [${x}, ${y}] znajdują się w regionie: "${actualRegion}"\n\n`;
-                        errorMsg += `ANALIZA BŁĘDU:\n`;
-                        
-                        // Analiza pionowa (Y)
-                        if (declaredVert !== actualVertical) {
-                          errorMsg += `• BŁĄD PIONOWY: f "${declaredVert}" ale Y=${y} to "${actualVertical}"\n`;
-                          if (declaredVert === "top" && actualVertical !== "top") {
-                            errorMsg += `  → Dla "top" Y musi być 0-255 (mały Y bo to GÓRA!)\n`;
-                          } else if (declaredVert === "bottom" && actualVertical !== "bottom") {
-                            errorMsg += `  → Dla "bottom" Y musi być 512-767 (duży Y bo to DÓŁ!)\n`;
-                          } else if (declaredVert === "middle" && actualVertical !== "middle") {
-                            errorMsg += `  → Dla "middle" Y musi być 256-511\n`;
-                          }
-                        }
-                        
-                        // Analiza pozioma (X)
-                        if (declaredHoriz !== actualHorizontal) {
-                          errorMsg += `• BŁĄD POZIOMY: Zadeklarowałeś "${declaredHoriz}" ale X=${x} to "${actualHorizontal}"\n`;
-                          if (declaredHoriz === "left" && actualHorizontal !== "left") {
-                            errorMsg += `  → Dla "left" X musi być 0-341\n`;
-                          } else if (declaredHoriz === "right" && actualHorizontal !== "right") {
-                            errorMsg += `  → Dla "right" X musi być 683-1023\n`;
-                          } else if (declaredHoriz === "center" && actualHorizontal !== "center") {
-                            errorMsg += `  → Dla "center" X musi być 342-682\n`;
-                          }
-                        }
-                        
-                        errorMsg += `\nPOPRAWNE ZAKRESY:\n`;
-                        errorMsg += `• top: Y=0-255, middle: Y=256-511, bottom: Y=512-767\n`;
-                        errorMsg += `• left: X=0-341, center: X=342-682, right: X=683-1023\n`;
-                        errorMsg += `\nPRZYKŁADY POPRAWNYCH WSPÓŁRZĘDNYCH:\n`;
-                        errorMsg += `• top-left: [170, 100], top-center: [512, 100], top-right: [850, 100]\n`;
-                        errorMsg += `• middle-left: [170, 380], middle-center: [512, 380], middle-right: [850, 380]\n`;
-                        errorMsg += `• bottom-left: [170, 650], bottom-center: [512, 650], bottom-right: [850, 650]\n`;
-                        errorMsg += `\n⚠️ PAMIĘTAJ: Y=0 to GÓRA ekranu, Y=767 to DÓŁ!\n`;
-                        errorMsg += `⚠️ Format ZAWSZE [X, Y] - poziomo, potem pionowo!\n`;
-                        
-                        throw new Error(errorMsg);
-                      }
                     }
 
                     switch (action) {
                       case "screenshot": {
                         const screenshot = await desktop.screenshot();
                         
-                        // Metadata z siatką 3x3 do łatwiejszego określania współrzędnych
                         const timestamp = new Date().toISOString();
                         const width = resolution.x;
                         const height = resolution.y;
-                        
-                        // Granice regionów
-                        const vBounds = { top: 255, middle: 511 }; // bottom to 512-767
-                        const hBounds = { left: 341, center: 682 }; // right to 683-1023
                         
                         resultText = `Screenshot taken at ${timestamp}
 
 SCREEN: ${width}×${height} pixels | Aspect ratio: 4:3 | Origin: (0,0) at TOP-LEFT
 ⚠️  REMEMBER: Y=0 is at TOP, Y increases DOWNWARD (0→767)
 ⚠️  FORMAT: [X, Y] - horizontal first, then vertical
-
-═══════════════════════════════════════════════════════════════════════
-🎯 3×3 GRID REFERENCE - Use this to pick coordinates accurately!
-═══════════════════════════════════════════════════════════════════════
-
-┌─────────────┬──────────────┬──────────────┐
-│  TOP-LEFT   │  TOP-CENTER  │  TOP-RIGHT   │
-│  Region     │  Region      │  Region      │
-│  X: 0-341   │  X: 342-682  │  X: 683-1023 │
-│  Y: 0-255   │  Y: 0-255    │  Y: 0-255    │
-│             │              │              │
-│  Example:   │  Example:    │  Example:    │
-│  [170, 128] │  [512, 128]  │  [853, 128]  │
-├─────────────┼──────────────┼──────────────┤
-│ MIDDLE-LEFT │MIDDLE-CENTER │ MIDDLE-RIGHT │
-│  Region     │  Region      │  Region      │
-│  X: 0-341   │  X: 342-682  │  X: 683-1023 │
-│  Y: 256-511 │  Y: 256-511  │  Y: 256-511  │
-│             │              │              │
-│  Example:   │  Example:    │  Example:    │
-│  [170, 384] │  [512, 384]  │  [853, 384]  │
-├─────────────┼──────────────┼──────────────┤
-│ BOTTOM-LEFT │BOTTOM-CENTER │ BOTTOM-RIGHT │
-│  Region     │  Region      │  Region      │
-│  X: 0-341   │  X: 342-682  │  X: 683-1023 │
-│  Y: 512-767 │  Y: 512-767  │  Y: 512-767  │
-│             │              │              │
-│  Example:   │  Example:    │  Example:    │
-│  [170, 640] │  [512, 640]  │  [853, 640]  │
-└─────────────┴──────────────┴──────────────┘
-
-KEY BOUNDARIES:
-• Vertical dividers: Y=255 (top/middle), Y=511 (middle/bottom)
-• Horizontal dividers: X=341 (left/center), X=682 (center/right)
 
 CORNER COORDINATES:
 • Top-left: (0, 0)        • Top-right: (1023, 0)
@@ -728,11 +623,9 @@ CORNER COORDINATES:
 
 WORKFLOW:
 1. Look at screenshot - identify element position
-2. Determine which of 9 regions it's in (e.g., "top-left")
-3. Use example coordinates as reference
-4. Adjust to center of actual element
-5. Set target_region parameter to match
-6. Double-check: Does Y value match vertical region? Does X match horizontal?`;
+2. Estimate coordinates based on visual position
+3. Adjust to center of actual element
+4. Double-check: Y=0 is TOP, Y=767 is BOTTOM`;
                         
                         resultData = {
                           type: "image",
@@ -961,23 +854,6 @@ WORKFLOW:
                 const centerX = Math.floor(width / 2);
                 const centerY = Math.floor(height / 2);
                 
-                // Siatka 3x3 - granice i centra regionów
-                const vBounds = { top: 255, middle: 511 }; // bottom to 512-767
-                const hBounds = { left: 341, center: 682 }; // right to 683-1023
-                
-                // Centra wszystkich 9 regionów
-                const regionCenters = {
-                  topLeft: [Math.floor(170), Math.floor(128)],
-                  topCenter: [Math.floor(512), Math.floor(128)],
-                  topRight: [Math.floor(853), Math.floor(128)],
-                  middleLeft: [Math.floor(170), Math.floor(384)],
-                  middleCenter: [Math.floor(512), Math.floor(384)],
-                  middleRight: [Math.floor(853), Math.floor(384)],
-                  bottomLeft: [Math.floor(170), Math.floor(640)],
-                  bottomCenter: [Math.floor(512), Math.floor(640)],
-                  bottomRight: [Math.floor(853), Math.floor(640)]
-                };
-                
                 chatHistory.push({
                   role: "user",
                   content: [
@@ -1016,7 +892,7 @@ WORKFLOW:
   - Compression: Lossless (PNG deflate)
   - Color Space: sRGB
 
-📊 COORDINATE SYSTEM - ABSOLUTE TRUTH:
+📊 COORDINATE SYSTEM:
   - Origin: (0, 0) at TOP-LEFT corner
   - X-axis Range: 0 to ${width - 1} (horizontal, LEFT → RIGHT)
   - Y-axis Range: 0 to ${height - 1} (vertical, TOP → BOTTOM)
@@ -1039,50 +915,12 @@ WORKFLOW:
   
   Screen Center: [${centerX}, ${centerY}]
 
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                  🎯 3×3 GRID REFERENCE SYSTEM (PRECISE)                   ║
-╚═══════════════════════════════════════════════════════════════════════════╝
-
-GRID BOUNDARIES (exact pixel ranges):
-  Vertical Regions:
-    - TOP:    Y = 0 to ${vBounds.top} (256 pixels)
-    - MIDDLE: Y = ${vBounds.top + 1} to ${vBounds.middle} (256 pixels)
-    - BOTTOM: Y = ${vBounds.middle + 1} to ${height - 1} (256 pixels)
-  
-  Horizontal Regions:
-    - LEFT:   X = 0 to ${hBounds.left} (342 pixels)
-    - CENTER: X = ${hBounds.left + 1} to ${hBounds.center} (341 pixels)
-    - RIGHT:  X = ${hBounds.center + 1} to ${width - 1} (341 pixels)
-
-┌──────────────────┬──────────────────┬──────────────────┐
-│   TOP-LEFT       │   TOP-CENTER     │   TOP-RIGHT      │
-│   Region: [0-341,│   Region: [342-  │   Region: [683-  │
-│            0-255] │   682, 0-255]    │   1023, 0-255]   │
-│   Center: [${regionCenters.topLeft[0]}, ${regionCenters.topLeft[1]}]│   Center: [${regionCenters.topCenter[0]}, ${regionCenters.topCenter[1]}] │   Center: [${regionCenters.topRight[0]}, ${regionCenters.topRight[1]}]  │
-├──────────────────┼──────────────────┼──────────────────┤
-│  MIDDLE-LEFT     │  MIDDLE-CENTER   │  MIDDLE-RIGHT    │
-│  Region: [0-341, │  Region: [342-   │  Region: [683-   │
-│          256-511]│  682, 256-511]   │  1023, 256-511]  │
-│  Center: [${regionCenters.middleLeft[0]}, ${regionCenters.middleLeft[1]}]│  Center: [${regionCenters.middleCenter[0]}, ${regionCenters.middleCenter[1]}] │  Center: [${regionCenters.middleRight[0]}, ${regionCenters.middleRight[1]}]  │
-├──────────────────┼──────────────────┼──────────────────┤
-│  BOTTOM-LEFT     │  BOTTOM-CENTER   │  BOTTOM-RIGHT    │
-│  Region: [0-341, │  Region: [342-   │  Region: [683-   │
-│          512-767]│  682, 512-767]   │  1023, 512-767]  │
-│  Center: [${regionCenters.bottomLeft[0]}, ${regionCenters.bottomLeft[1]}]│  Center: [${regionCenters.bottomCenter[0]}, ${regionCenters.bottomCenter[1]}] │  Center: [${regionCenters.bottomRight[0]}, ${regionCenters.bottomRight[1]}]  │
-└──────────────────┴──────────────────┴──────────────────┘
-
 ⚠️  COORDINATE VALIDATION RULES:
   1. Valid X range: 0 ≤ X ≤ ${width - 1}
   2. Valid Y range: 0 ≤ Y ≤ ${height - 1}
   3. Format: ALWAYS [X, Y] - horizontal first, vertical second
   4. Y=0 is TOP (not bottom!) - Y increases DOWNWARD
-  5. All coordinates MUST be integers (no decimals)
-
-💡 USAGE TIPS:
-  - Use region centers as reference points for clicking
-  - Always verify element position before clicking
-  - Remember: Small Y = top of screen, Large Y = bottom of screen
-  - Use screenshot to verify coordinates before each action`,
+  5. All coordinates MUST be integers (no decimals)`,
                     },
                     {
                       type: "image_url",
