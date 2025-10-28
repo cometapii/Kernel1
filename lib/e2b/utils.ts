@@ -5,6 +5,7 @@ import { Stagehand } from "@browserbasehq/stagehand";
 import { resolution } from "./tool";
 
 const KERNEL_API_KEY = "sk_bb9ec7e8-9e45-42a5-9d68-72736f11ef05.ffpPsG9fh2Gh+g1uWxA1U8+d7PW29Kpjiqm1+/XlBWk";
+const GOOGLE_API_KEY = "AIzaSyBBIoNEFvRLhApDBBaDSEZeenDEVg4ar6U";
 
 // Global storage for browser sessions
 const browserSessions = new Map<string, {
@@ -40,12 +41,14 @@ export const getDesktop = async (id?: string) => {
     // Initialize Stagehand with Kernel browser
     const stagehand = new Stagehand({
       env: 'LOCAL',
-      verbose: 1,
+      verbose: 0,
+      disablePino: true,
       domSettleTimeoutMs: 30_000,
-      modelName: 'openai/gpt-4.1',
+      modelName: 'google/gemini-2.0-flash',
       modelClientOptions: {
-        apiKey: process.env.OPENAI_API_KEY
+        apiKey: GOOGLE_API_KEY
       },
+      enableCaching: false,
       localBrowserLaunchOptions: {
         cdpUrl: kernelBrowser.cdp_ws_url
       }
@@ -53,12 +56,6 @@ export const getDesktop = async (id?: string) => {
 
     await stagehand.init();
     const page = stagehand.page;
-
-    // Set viewport to match resolution
-    await (page as any).setViewport({
-      width: resolution.x,
-      height: resolution.y,
-    });
 
     const session = {
       sessionId: kernelBrowser.session_id,

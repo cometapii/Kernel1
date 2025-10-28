@@ -18,6 +18,15 @@ const nextConfig: NextConfig = {
   
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-dialog', '@radix-ui/react-label', '@radix-ui/react-slot', '@radix-ui/react-tooltip'],
+    workerThreads: false,
+    cpus: 1,
+  },
+  
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals.push('pino', 'pino-pretty', 'thread-stream');
+    }
+    return config;
   },
   
   async headers() {
